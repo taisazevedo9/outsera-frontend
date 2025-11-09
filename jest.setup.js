@@ -1,8 +1,8 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom'
 
-// Silencia warnings do React sobre act(...) em testes assíncronos
-// Esses warnings são esperados quando testamos hooks com estado assíncrono
+// Suppress React warnings about act(...) in async tests
+// These warnings are expected when testing hooks with async state
 const originalError = console.error;
 beforeAll(() => {
   console.error = (...args) => {

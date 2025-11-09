@@ -170,7 +170,7 @@ describe("ApiClient", () => {
 
   describe("buildUrl", () => {
     it("should build URL without params", () => {
-      // Testando através do método get público
+      // Testing through the public get method
       const mockData = { id: 1 };
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,

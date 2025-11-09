@@ -18,3 +18,24 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+.main-content {
+  min-height: 100vh;
+  margin-left: 0;
+  width: 100%;
+  padding-top: 60px;
+}
+
+@media (min-width: 768px) {
+  .main-content {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .main-content {
+    padding-top: 55px;
+  }
+}

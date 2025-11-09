@@ -252,7 +252,7 @@ describe("Sidebar", () => {
     it("should have fixed position", () => {
       render(<Sidebar />);
       const nav = screen.getByRole("navigation");
-      expect(nav).toHaveStyle({ position: "fixed" });
+      expect(nav).toHaveClass("position-fixed");
     });
 
     it("should have left 0 position", () => {
@@ -279,11 +279,11 @@ describe("Sidebar", () => {
       expect(nav).toHaveStyle({
         width: "250px",
         minHeight: "100vh",
-        position: "fixed",
         left: 0,
         top: 0,
         overflowY: "auto",
       });
+      expect(nav).toHaveClass("position-fixed");
     });
 
     it("should have borderRadius on links", () => {

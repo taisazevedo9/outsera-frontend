@@ -1,49 +1,49 @@
 # Outsera Frontend
 
-Avaliação - Front-end
+Frontend Assessment
 
-Projeto Next.js 14 com TypeScript e Bootstrap 5.
+Next.js 14 project with TypeScript and Bootstrap 5.
 
-## 🚀 Tecnologias
+## 🚀 Technologies
 
-- **Next.js 14** - Framework React para produção
-- **React 18** - Biblioteca JavaScript para interfaces
-- **TypeScript** - Superset JavaScript com tipagem estática
-- **Bootstrap 5.3** - Framework CSS responsivo
-- **React Bootstrap** - Componentes Bootstrap para React
+- **Next.js 14** - React framework for production
+- **React 18** - JavaScript library for user interfaces
+- **TypeScript** - JavaScript superset with static typing
+- **Bootstrap 5.3** - Responsive CSS framework
+- **React Bootstrap** - Bootstrap components for React
 
-## 📋 Pré-requisitos
+## 📋 Prerequisites
 
 - Node.js 18+
-- npm ou yarn
+- npm or yarn
 
-## 🔧 Instalação
+## 🔧 Installation
 
 ```bash
-# Instalar dependências
+# Install dependencies
 npm install
 
-# Configurar variáveis de ambiente
+# Configure environment variables
 cp .env.local.example .env.local
 ```
 
-## ⚙️ Variáveis de Ambiente
+## ⚙️ Environment Variables
 
-Crie um arquivo `.env.local` na raiz do projeto:
+Create a `.env.local` file in the project root:
 
 ```env
-NEXT_PUBLIC_API_BASE_URL="URL PARA A REQUISIÇÃO"
+NEXT_PUBLIC_API_BASE_URL="API REQUEST URL"
 ```
 
-## 🏃 Executando o projeto
+## 🏃 Running the Project
 
 ```bash
-# Modo desenvolvimento
+# Development mode
 npm run dev
 ```
 
-Acesse [http://localhost:3000](http://localhost:3000) no navegador.
+Access [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 📝 Licença
+## 📝 License
 
-Este projeto é privado.
+This project is private.
