@@ -4,7 +4,7 @@ Frontend Assessment
 
 Next.js 14 project with TypeScript and Bootstrap 5.
 
-## 🚀 Technologies
+## Technologies
 
 - **Next.js 14** - React framework for production
 - **React 18** - JavaScript library for user interfaces
@@ -12,12 +12,12 @@ Next.js 14 project with TypeScript and Bootstrap 5.
 - **Bootstrap 5.3** - Responsive CSS framework
 - **React Bootstrap** - Bootstrap components for React
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Node.js 18+
 - npm or yarn
 
-## 🔧 Installation
+## Installation
 
 ```bash
 # Install dependencies
@@ -27,7 +27,7 @@ npm install
 cp .env.local.example .env.local
 ```
 
-## ⚙️ Environment Variables
+## Environment Variables
 
 Create a `.env.local` file in the project root:
 
@@ -35,7 +35,7 @@ Create a `.env.local` file in the project root:
 NEXT_PUBLIC_API_BASE_URL="API REQUEST URL"
 ```
 
-## 🏃 Running the Project
+## Running the Project
 
 ```bash
 # Development mode
@@ -43,7 +43,3 @@ npm run dev
 ```
 
 Access [http://localhost:3000](http://localhost:3000) in your browser.
-
-## 📝 License
-
-This project is private.
