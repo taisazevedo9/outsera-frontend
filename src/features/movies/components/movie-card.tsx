@@ -55,17 +55,23 @@ export function MovieCard({
 }: MovieCardProps) {
   const [yearFilter, setYearFilter] = useState<string>("");
   const [winnerFilter, setWinnerFilter] = useState<string>("");
-  const [appliedFilters, setAppliedFilters] = useState(initialFilters || {});
-  const { movies, loading, error, refetch } = useMovies(appliedFilters);
+  const [currentPage, setCurrentPage] = useState(initialFilters?.page || 0);
+  const [appliedFilters, setAppliedFilters] = useState({
+    ...initialFilters,
+    page: initialFilters?.page || 0,
+    size: initialFilters?.size || itemsPerPage,
+  });
+  const { movies, totalPages, loading, error, refetch } = useMovies(appliedFilters);
 
   useEffect(() => {
-    if (Object.keys(appliedFilters).length > 0) {
-      refetch();
-    }
+    refetch();
   }, [appliedFilters, refetch]);
 
   const handleApplyFilters = () => {
-    const filters: any = { ...initialFilters };
+    const filters: any = {
+      page: 0,
+      size: initialFilters?.size || itemsPerPage,
+    };
 
     if (yearFilter) {
       filters.year = parseInt(yearFilter, 10);
@@ -75,13 +81,26 @@ export function MovieCard({
       filters.winner = winnerFilter === "true";
     }
 
+    setCurrentPage(0);
     setAppliedFilters(filters);
   };
 
   const handleClearFilters = () => {
     setYearFilter("");
     setWinnerFilter("");
-    setAppliedFilters(initialFilters || {});
+    setCurrentPage(0);
+    setAppliedFilters({
+      page: 0,
+      size: initialFilters?.size || itemsPerPage,
+    });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    setAppliedFilters((prev) => ({
+      ...prev,
+      page: newPage,
+    }));
   };
 
   return (
@@ -141,6 +160,9 @@ export function MovieCard({
         showFilters={false}
         itemsPerPage={itemsPerPage}
         showPagination={true}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
       />
     </Card>
   );

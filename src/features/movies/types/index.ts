@@ -1,13 +1,32 @@
 import { Movie } from "@/features/dashboard/types";
 
 export interface MoviePagedResponse {
-  content: Movie[];
-  pageable: {
-    pageNumber: number;
-    pageSize: number;
-  };
   totalElements: number;
   totalPages: number;
+  pageable: {
+    unpaged: boolean;
+    paged: boolean;
+    pageSize: number;
+    pageNumber: number;
+    offset: number;
+    sort: {
+      unsorted: boolean;
+      sorted: boolean;
+      empty: boolean;
+    };
+  };
+  numberOfElements: number;
+  size: number;
+  content: Movie[];
+  number: number;
+  sort: {
+    unsorted: boolean;
+    sorted: boolean;
+    empty: boolean;
+  };
+  first: boolean;
+  last: boolean;
+  empty: boolean;
 }
 
 export interface MovieFilters {

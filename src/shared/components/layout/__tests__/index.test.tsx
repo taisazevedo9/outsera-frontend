@@ -148,9 +148,9 @@ describe("PageLayout", () => {
       expect(container.firstChild?.nodeName).toBe("MAIN");
     });
 
-    it("should have container with py-5 class", () => {
+    it("should have wrapper div with w-100 class", () => {
       const { container } = render(<PageLayout title="Test">Content</PageLayout>);
-      const div = container.querySelector(".container.py-5");
+      const div = container.querySelector(".w-100");
       expect(div).toBeInTheDocument();
     });
 
@@ -187,29 +187,29 @@ describe("PageLayout", () => {
   });
 
   describe("CSS classes", () => {
-    it("should have container class", () => {
+    it("should have w-100 class", () => {
       const { container } = render(<PageLayout title="Test">Content</PageLayout>);
-      const div = container.querySelector(".container");
+      const div = container.querySelector(".w-100");
       expect(div).toBeInTheDocument();
     });
 
-    it("should have py-5 class for padding", () => {
+    it("should have py-3 class for padding", () => {
       const { container } = render(<PageLayout title="Test">Content</PageLayout>);
-      const div = container.querySelector(".py-5");
+      const div = container.querySelector(".py-3");
       expect(div).toBeInTheDocument();
     });
 
-    it("should have both container and py-5 classes", () => {
+    it("should have responsive padding classes", () => {
       const { container } = render(<PageLayout title="Test">Content</PageLayout>);
-      const div = container.querySelector(".container.py-5");
+      const div = container.querySelector(".py-3.py-md-4");
       expect(div).toBeInTheDocument();
-      expect(div?.classList.contains("container")).toBe(true);
-      expect(div?.classList.contains("py-5")).toBe(true);
+      expect(div?.classList.contains("py-3")).toBe(true);
+      expect(div?.classList.contains("py-md-4")).toBe(true);
     });
 
-    it("should use Bootstrap container", () => {
+    it("should use responsive wrapper classes", () => {
       const { container } = render(<PageLayout title="Test">Content</PageLayout>);
-      const div = container.querySelector("div.container");
+      const div = container.querySelector("div.w-100");
       expect(div).toBeInTheDocument();
     });
   });
@@ -368,7 +368,7 @@ describe("PageLayout", () => {
     it("should have proper semantic structure", () => {
       const { container } = render(<PageLayout title="Test">Content</PageLayout>);
       const main = container.querySelector("main");
-      const div = main?.querySelector(".container");
+      const div = main?.querySelector(".w-100");
       expect(div).toBeInTheDocument();
     });
 
@@ -402,11 +402,11 @@ describe("PageLayout", () => {
       const { container } = render(<PageLayout title="Test">Content</PageLayout>);
       
       const main = container.querySelector("main") as HTMLElement;
-      const containerDiv = main?.querySelector(".container") as HTMLElement;
-      const cardContent = containerDiv?.querySelector('[data-testid="card-content"]') as HTMLElement;
+      const wrapperDiv = main?.querySelector(".w-100") as HTMLElement;
+      const cardContent = wrapperDiv?.querySelector('[data-testid="card-content"]') as HTMLElement;
       
-      expect(main).toContainElement(containerDiv);
-      expect(containerDiv).toContainElement(cardContent);
+      expect(main).toContainElement(wrapperDiv);
+      expect(wrapperDiv).toContainElement(cardContent);
     });
   });
 

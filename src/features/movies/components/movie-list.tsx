@@ -9,7 +9,7 @@ export function MovieList() {
         title="Movie List"
         colSize="col-12"
         showFilters={true}
-        initialFilters={{ page: 0, size: 99 }}
+        initialFilters={{ page: 0, size: 15 }}
       />
     </>
   );

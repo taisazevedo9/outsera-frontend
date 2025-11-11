@@ -32,7 +32,7 @@ cp .env.local.example .env.local
 Create a `.env.local` file in the project root:
 
 ```env
-NEXT_PUBLIC_API_BASE_URL="API REQUEST URL"
+NEXT_PUBLIC_API_URL="API REQUEST URL"
 ```
 
 ## Running the Project

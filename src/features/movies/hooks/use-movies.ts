@@ -6,10 +6,8 @@ import { MovieService } from "../api/movie-service";
 import { MovieFilters } from "../types";
 import { ApiClient } from "@/shared/services/api-client";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
-
 export function useMovies(filters?: MovieFilters) {
-  const apiClient = useMemo(() => new ApiClient(API_BASE), []);
+  const apiClient = useMemo(() => new ApiClient(), []);
   const movieService = useMemo(() => new MovieService(apiClient), [apiClient]);
 
   const fetcher = useCallback(() => {
@@ -22,7 +20,9 @@ export function useMovies(filters?: MovieFilters) {
   });
 
   return {
-    movies: data || [],
+    movies: data?.movies || [],
+    totalPages: data?.totalPages || 0,
+    totalElements: data?.totalElements || 0,
     loading,
     error,
     refetch,

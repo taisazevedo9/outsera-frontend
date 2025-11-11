@@ -92,9 +92,9 @@ describe("PageContent", () => {
   });
 
   describe("Component structure", () => {
-    it("should have outer div with col-lg-12 class", () => {
+    it("should have outer div with col-12 class", () => {
       const { container } = render(<PageContent>Content</PageContent>);
-      const outerDiv = container.querySelector(".col-lg-12");
+      const outerDiv = container.querySelector(".col-12");
       expect(outerDiv).toBeInTheDocument();
     });
 
@@ -104,16 +104,16 @@ describe("PageContent", () => {
       expect(innerDiv).toBeInTheDocument();
     });
 
-    it("should have inner div with mt-4 class", () => {
+    it("should have inner div with mt-3 class", () => {
       const { container } = render(<PageContent>Content</PageContent>);
-      const innerDiv = container.querySelector(".mt-4");
+      const innerDiv = container.querySelector(".mt-3");
       expect(innerDiv).toBeInTheDocument();
     });
 
     it("should nest inner div inside outer div", () => {
       const { container } = render(<PageContent>Content</PageContent>);
-      const outerDiv = container.querySelector(".col-lg-12") as HTMLElement;
-      const innerDiv = container.querySelector(".row.mt-4") as HTMLElement;
+      const outerDiv = container.querySelector(".col-12") as HTMLElement;
+      const innerDiv = container.querySelector(".row.mt-3") as HTMLElement;
       expect(outerDiv).toContainElement(innerDiv);
     });
 
@@ -125,15 +125,15 @@ describe("PageContent", () => {
 
     it("should render children inside inner div", () => {
       const { container } = render(<PageContent>Test</PageContent>);
-      const innerDiv = container.querySelector(".row.mt-4");
+      const innerDiv = container.querySelector(".row.mt-3");
       expect(innerDiv).toHaveTextContent("Test");
     });
   });
 
   describe("CSS classes", () => {
-    it("should have col-lg-12 class", () => {
+    it("should have col-12 class", () => {
       const { container } = render(<PageContent>Content</PageContent>);
-      const div = container.querySelector(".col-lg-12");
+      const div = container.querySelector(".col-12");
       expect(div).toBeInTheDocument();
     });
 
@@ -143,29 +143,29 @@ describe("PageContent", () => {
       expect(div).toBeInTheDocument();
     });
 
-    it("should have mt-4 class", () => {
+    it("should have mt-3 class", () => {
       const { container } = render(<PageContent>Content</PageContent>);
-      const div = container.querySelector(".mt-4");
+      const div = container.querySelector(".mt-3");
       expect(div).toBeInTheDocument();
     });
 
-    it("should have both row and mt-4 classes on inner div", () => {
+    it("should have both row and mt-3 classes on inner div", () => {
       const { container } = render(<PageContent>Content</PageContent>);
-      const innerDiv = container.querySelector(".row.mt-4");
+      const innerDiv = container.querySelector(".row.mt-3");
       expect(innerDiv).toBeInTheDocument();
       expect(innerDiv?.classList.contains("row")).toBe(true);
-      expect(innerDiv?.classList.contains("mt-4")).toBe(true);
+      expect(innerDiv?.classList.contains("mt-3")).toBe(true);
     });
 
     it("should use Bootstrap grid classes", () => {
       const { container } = render(<PageContent>Content</PageContent>);
-      expect(container.querySelector(".col-lg-12")).toBeInTheDocument();
+      expect(container.querySelector(".col-12")).toBeInTheDocument();
       expect(container.querySelector(".row")).toBeInTheDocument();
     });
 
     it("should use Bootstrap spacing class", () => {
       const { container } = render(<PageContent>Content</PageContent>);
-      const div = container.querySelector(".mt-4");
+      const div = container.querySelector(".mt-3");
       expect(div).toBeInTheDocument();
     });
   });
@@ -173,7 +173,7 @@ describe("PageContent", () => {
   describe("Layout behavior", () => {
     it("should use full width column", () => {
       const { container } = render(<PageContent>Content</PageContent>);
-      const col = container.querySelector(".col-lg-12");
+      const col = container.querySelector(".col-12");
       expect(col).toBeInTheDocument();
     });
 
@@ -185,13 +185,13 @@ describe("PageContent", () => {
 
     it("should apply top margin", () => {
       const { container } = render(<PageContent>Content</PageContent>);
-      const div = container.querySelector(".mt-4");
+      const div = container.querySelector(".mt-3");
       expect(div).toBeInTheDocument();
     });
 
     it("should maintain responsive layout structure", () => {
       const { container } = render(<PageContent>Content</PageContent>);
-      expect(container.querySelector(".col-lg-12")).toBeInTheDocument();
+      expect(container.querySelector(".col-12")).toBeInTheDocument();
       expect(container.querySelector(".row")).toBeInTheDocument();
     });
   });
@@ -246,10 +246,10 @@ describe("PageContent", () => {
 
     it("should maintain structure on rerender", () => {
       const { container, rerender } = render(<PageContent>First</PageContent>);
-      const firstStructure = container.querySelector(".col-lg-12");
+      const firstStructure = container.querySelector(".col-12");
 
       rerender(<PageContent>Second</PageContent>);
-      const secondStructure = container.querySelector(".col-lg-12");
+      const secondStructure = container.querySelector(".col-12");
 
       expect(firstStructure).toBeInTheDocument();
       expect(secondStructure).toBeInTheDocument();
@@ -268,25 +268,25 @@ describe("PageContent", () => {
       
       rerender(<PageContent>Second</PageContent>);
       
-      expect(container.querySelector(".col-lg-12")).toBeInTheDocument();
-      expect(container.querySelector(".row.mt-4")).toBeInTheDocument();
+      expect(container.querySelector(".col-12")).toBeInTheDocument();
+      expect(container.querySelector(".row.mt-3")).toBeInTheDocument();
     });
   });
 
   describe("Edge cases", () => {
     it("should handle empty string children", () => {
       const { container } = render(<PageContent>{""}</PageContent>);
-      expect(container.querySelector(".row.mt-4")).toBeInTheDocument();
+      expect(container.querySelector(".row.mt-3")).toBeInTheDocument();
     });
 
     it("should handle null children", () => {
       const { container } = render(<PageContent>{null}</PageContent>);
-      expect(container.querySelector(".row.mt-4")).toBeInTheDocument();
+      expect(container.querySelector(".row.mt-3")).toBeInTheDocument();
     });
 
     it("should handle undefined children", () => {
       const { container } = render(<PageContent>{undefined}</PageContent>);
-      expect(container.querySelector(".row.mt-4")).toBeInTheDocument();
+      expect(container.querySelector(".row.mt-3")).toBeInTheDocument();
     });
 
     it("should handle numeric children", () => {
@@ -296,7 +296,7 @@ describe("PageContent", () => {
 
     it("should handle boolean children", () => {
       const { container } = render(<PageContent>{true}</PageContent>);
-      expect(container.querySelector(".row.mt-4")).toBeInTheDocument();
+      expect(container.querySelector(".row.mt-3")).toBeInTheDocument();
     });
 
     it("should handle array of children", () => {
@@ -460,8 +460,8 @@ describe("PageContent", () => {
   describe("Container structure", () => {
     it("should have proper nesting", () => {
       const { container } = render(<PageContent>Nested</PageContent>);
-      const outer = container.querySelector(".col-lg-12") as HTMLElement;
-      const inner = container.querySelector(".row.mt-4") as HTMLElement;
+      const outer = container.querySelector(".col-12") as HTMLElement;
+      const inner = container.querySelector(".row.mt-3") as HTMLElement;
       
       expect(outer).toContainElement(inner);
     });
@@ -472,7 +472,7 @@ describe("PageContent", () => {
           <div data-testid="child">Child</div>
         </PageContent>
       );
-      const inner = container.querySelector(".row.mt-4");
+      const inner = container.querySelector(".row.mt-3");
       const child = screen.getByTestId("child");
       
       expect(inner).toContainElement(child);
@@ -480,7 +480,7 @@ describe("PageContent", () => {
 
     it("should maintain wrapper divs", () => {
       const { container } = render(<PageContent>Content</PageContent>);
-      expect(container.querySelector(".col-lg-12")).toBeInTheDocument();
+      expect(container.querySelector(".col-12")).toBeInTheDocument();
       expect(container.querySelector(".row")).toBeInTheDocument();
     });
   });
@@ -504,7 +504,7 @@ describe("PageContent", () => {
           <PageContent>Second</PageContent>
         </>
       );
-      const cols = container.querySelectorAll(".col-lg-12");
+      const cols = container.querySelectorAll(".col-12");
       expect(cols).toHaveLength(2);
     });
 

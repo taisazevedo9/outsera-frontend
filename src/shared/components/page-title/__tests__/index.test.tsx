@@ -79,13 +79,13 @@ describe("PageTitle", () => {
     it("should have default empty className", () => {
       render(<PageTitle title="Test" />);
       const heading = screen.getByRole("heading");
-      expect(heading.className).toContain("display-4");
+      expect(heading.className).toContain("display-5");
     });
 
     it("should append className to existing classes", () => {
       render(<PageTitle title="Test" className="extra" />);
       const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("display-4");
+      expect(heading).toHaveClass("display-5");
       expect(heading).toHaveClass("extra");
     });
 
@@ -99,7 +99,7 @@ describe("PageTitle", () => {
     it("should handle empty string className", () => {
       render(<PageTitle title="Test" className="" />);
       const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("display-4");
+      expect(heading).toHaveClass("display-5");
     });
 
     it("should not break with undefined className", () => {
@@ -144,10 +144,10 @@ describe("PageTitle", () => {
   });
 
   describe("CSS classes", () => {
-    it("should have display-4 class", () => {
+    it("should have display-5 class", () => {
       render(<PageTitle title="Test" />);
       const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("display-4");
+      expect(heading).toHaveClass("display-5");
     });
 
     it("should have fw-bold class", () => {
@@ -171,7 +171,7 @@ describe("PageTitle", () => {
     it("should have all Bootstrap classes", () => {
       render(<PageTitle title="Test" />);
       const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("display-4");
+      expect(heading).toHaveClass("display-5");
       expect(heading).toHaveClass("fw-bold");
       expect(heading).toHaveClass("text-primary");
       expect(heading).toHaveClass("mb-2");
@@ -185,10 +185,10 @@ describe("PageTitle", () => {
   });
 
   describe("Typography", () => {
-    it("should use Bootstrap display-4 for large heading", () => {
+    it("should use Bootstrap display-5 for large heading", () => {
       render(<PageTitle title="Test" />);
       const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("display-4");
+      expect(heading).toHaveClass("display-5");
     });
 
     it("should have bold font weight", () => {
@@ -291,7 +291,7 @@ describe("PageTitle", () => {
       rerender(<PageTitle title="Second" />);
 
       const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("display-4");
+      expect(heading).toHaveClass("display-5");
       expect(heading).toHaveClass("fw-bold");
       expect(heading).toHaveClass("text-primary");
     });
@@ -461,7 +461,7 @@ describe("PageTitle", () => {
     it("should have large display heading", () => {
       render(<PageTitle title="Large" />);
       const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("display-4");
+      expect(heading).toHaveClass("display-5");
     });
 
     it("should have bold text", () => {
@@ -535,21 +535,21 @@ describe("PageTitle", () => {
     it("should handle omitted className prop", () => {
       render(<PageTitle title="Test" />);
       const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("display-4");
+      expect(heading).toHaveClass("display-5");
     });
 
     it("should concatenate className properly", () => {
       render(<PageTitle title="Test" className="custom" />);
       const heading = screen.getByRole("heading");
       const classes = heading.className;
-      expect(classes).toContain("display-4");
+      expect(classes).toContain("display-5");
       expect(classes).toContain("custom");
     });
 
     it("should handle trailing space in className concatenation", () => {
       render(<PageTitle title="Test" />);
       const heading = screen.getByRole("heading");
-      expect(heading).toHaveClass("display-4");
+      expect(heading).toHaveClass("display-5");
       expect(heading).toHaveClass("mb-2");
     });
   });

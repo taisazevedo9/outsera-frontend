@@ -28,6 +28,12 @@ describe("useMovies", () => {
     },
   ];
 
+  const mockMoviePageData = {
+    movies: mockMovies,
+    totalPages: 5,
+    totalElements: 100,
+  };
+
   const mockApiClient = {
     get: jest.fn(),
   };
@@ -40,13 +46,15 @@ describe("useMovies", () => {
     jest.clearAllMocks();
     (ApiClient as jest.Mock).mockImplementation(() => mockApiClient);
     (MovieService as jest.Mock).mockImplementation(() => mockMovieService);
-    mockMovieService.getMovies.mockResolvedValue(mockMovies);
+    mockMovieService.getMovies.mockResolvedValue(mockMoviePageData);
   });
 
   it("should initialize with empty movies array and loading state", () => {
     const { result } = renderHook(() => useMovies());
 
     expect(result.current.movies).toEqual([]);
+    expect(result.current.totalPages).toBe(0);
+    expect(result.current.totalElements).toBe(0);
     expect(result.current.loading).toBe(true);
     expect(result.current.error).toBeNull();
   });
@@ -61,6 +69,8 @@ describe("useMovies", () => {
     expect(mockMovieService.getMovies).toHaveBeenCalledTimes(1);
     expect(mockMovieService.getMovies).toHaveBeenCalledWith({});
     expect(result.current.movies).toEqual(mockMovies);
+    expect(result.current.totalPages).toBe(5);
+    expect(result.current.totalElements).toBe(100);
   });
 
   it("should fetch movies with filters", async () => {
@@ -73,6 +83,8 @@ describe("useMovies", () => {
 
     expect(mockMovieService.getMovies).toHaveBeenCalledWith(filters);
     expect(result.current.movies).toEqual(mockMovies);
+    expect(result.current.totalPages).toBe(5);
+    expect(result.current.totalElements).toBe(100);
   });
 
   it("should handle errors when fetching movies", async () => {
@@ -87,6 +99,8 @@ describe("useMovies", () => {
 
     expect(result.current.error).toBe(errorMessage);
     expect(result.current.movies).toEqual([]);
+    expect(result.current.totalPages).toBe(0);
+    expect(result.current.totalElements).toBe(0);
   });
 
   it("should provide refetch function", async () => {
@@ -124,11 +138,19 @@ describe("useMovies", () => {
       },
     ];
 
-    mockMovieService.getMovies.mockResolvedValueOnce(updatedMovies);
+    const updatedPageData = {
+      movies: updatedMovies,
+      totalPages: 1,
+      totalElements: 1,
+    };
+
+    mockMovieService.getMovies.mockResolvedValueOnce(updatedPageData);
     result.current.refetch();
 
     await waitFor(() => {
       expect(result.current.movies).toEqual(updatedMovies);
+      expect(result.current.totalPages).toBe(1);
+      expect(result.current.totalElements).toBe(1);
     });
   });
 
@@ -141,6 +163,8 @@ describe("useMovies", () => {
 
     expect(mockMovieService.getMovies).toHaveBeenCalledWith({});
     expect(result.current.movies).toEqual(mockMovies);
+    expect(result.current.totalPages).toBe(5);
+    expect(result.current.totalElements).toBe(100);
   });
 
   it("should handle partial filters", async () => {
@@ -153,6 +177,8 @@ describe("useMovies", () => {
 
     expect(mockMovieService.getMovies).toHaveBeenCalledWith(filters);
     expect(result.current.movies).toEqual(mockMovies);
+    expect(result.current.totalPages).toBe(5);
+    expect(result.current.totalElements).toBe(100);
   });
 
   it("should create ApiClient with API_BASE from const", () => {
@@ -163,13 +189,14 @@ describe("useMovies", () => {
     expect(ApiClient).toHaveBeenCalled();
   });
 
-  it("should use empty string as API_BASE when env is not set", () => {
+  it("should use default API_BASE_URL from ApiClient when env is not set", () => {
     const originalEnv = process.env.NEXT_PUBLIC_API_URL;
     delete process.env.NEXT_PUBLIC_API_URL;
 
     renderHook(() => useMovies());
 
-    expect(ApiClient).toHaveBeenCalledWith("");
+    // ApiClient now uses default parameter, so it's called without arguments
+    expect(ApiClient).toHaveBeenCalledWith();
 
     process.env.NEXT_PUBLIC_API_URL = originalEnv;
   });
@@ -232,6 +259,8 @@ describe("useMovies", () => {
     });
 
     expect(result.current.movies).toEqual([]);
+    expect(result.current.totalPages).toBe(0);
+    expect(result.current.totalElements).toBe(0);
   });
 
   it("should return empty array when data is undefined", async () => {
@@ -244,6 +273,8 @@ describe("useMovies", () => {
     });
 
     expect(result.current.movies).toEqual([]);
+    expect(result.current.totalPages).toBe(0);
+    expect(result.current.totalElements).toBe(0);
   });
 
   it("should handle network errors", async () => {
@@ -258,10 +289,16 @@ describe("useMovies", () => {
 
     expect(result.current.error).toBe("Network error");
     expect(result.current.movies).toEqual([]);
+    expect(result.current.totalPages).toBe(0);
+    expect(result.current.totalElements).toBe(0);
   });
 
   it("should handle empty movies array response", async () => {
-    mockMovieService.getMovies.mockResolvedValueOnce([]);
+    mockMovieService.getMovies.mockResolvedValueOnce({
+      movies: [],
+      totalPages: 0,
+      totalElements: 0,
+    });
 
     const { result } = renderHook(() => useMovies());
 
@@ -270,6 +307,8 @@ describe("useMovies", () => {
     });
 
     expect(result.current.movies).toEqual([]);
+    expect(result.current.totalPages).toBe(0);
+    expect(result.current.totalElements).toBe(0);
     expect(result.current.error).toBeNull();
   });
 
@@ -283,7 +322,11 @@ describe("useMovies", () => {
       winner: i % 2 === 0,
     }));
 
-    mockMovieService.getMovies.mockResolvedValueOnce(largeMovies);
+    mockMovieService.getMovies.mockResolvedValueOnce({
+      movies: largeMovies,
+      totalPages: 10,
+      totalElements: 1000,
+    });
 
     const { result } = renderHook(() => useMovies());
 
@@ -293,6 +336,8 @@ describe("useMovies", () => {
 
     expect(result.current.movies).toEqual(largeMovies);
     expect(result.current.movies.length).toBe(100);
+    expect(result.current.totalPages).toBe(10);
+    expect(result.current.totalElements).toBe(1000);
   });
 
   it("should show loading state during refetch", async () => {

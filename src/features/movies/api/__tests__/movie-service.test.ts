@@ -31,11 +31,30 @@ describe("MovieService", () => {
   const mockPagedResponse: MoviePagedResponse = {
     content: mockMovies,
     pageable: {
-      pageNumber: 0,
+      unpaged: false,
+      paged: true,
       pageSize: 10,
+      pageNumber: 0,
+      offset: 0,
+      sort: {
+        unsorted: true,
+        sorted: false,
+        empty: true,
+      },
     },
     totalElements: 2,
     totalPages: 1,
+    numberOfElements: 2,
+    size: 10,
+    number: 0,
+    sort: {
+      unsorted: true,
+      sorted: false,
+      empty: true,
+    },
+    first: true,
+    last: true,
+    empty: false,
   };
 
   beforeEach(() => {
@@ -67,7 +86,11 @@ describe("MovieService", () => {
       expect(mockApiClient.get).toHaveBeenCalledWith("/api/movies", {
         params: filters,
       });
-      expect(result).toEqual(mockMovies);
+      expect(result).toEqual({
+        movies: mockMovies,
+        totalPages: mockPagedResponse.totalPages,
+        totalElements: mockPagedResponse.totalElements,
+      });
     });
 
     it("should fetch movies with empty filters", async () => {
@@ -80,7 +103,11 @@ describe("MovieService", () => {
       expect(mockApiClient.get).toHaveBeenCalledWith("/api/movies", {
         params: {},
       });
-      expect(result).toEqual(mockMovies);
+      expect(result).toEqual({
+        movies: mockMovies,
+        totalPages: mockPagedResponse.totalPages,
+        totalElements: mockPagedResponse.totalElements,
+      });
     });
 
     it("should fetch movies with partial filters", async () => {
@@ -95,32 +122,59 @@ describe("MovieService", () => {
       expect(mockApiClient.get).toHaveBeenCalledWith("/api/movies", {
         params: { year: 2020 },
       });
-      expect(result).toEqual(mockMovies);
+      expect(result).toEqual({
+        movies: mockMovies,
+        totalPages: mockPagedResponse.totalPages,
+        totalElements: mockPagedResponse.totalElements,
+      });
     });
 
-    it("should return only content from paged response", async () => {
+    it("should return MoviePageData with all properties", async () => {
       mockApiClient.get.mockResolvedValueOnce(mockPagedResponse);
 
       const result = await movieService.getMovies({});
 
-      expect(result).toEqual(mockMovies);
-      expect(result).not.toHaveProperty("pageable");
-      expect(result).not.toHaveProperty("totalElements");
+      expect(result).toEqual({
+        movies: mockMovies,
+        totalPages: mockPagedResponse.totalPages,
+        totalElements: mockPagedResponse.totalElements,
+      });
+      expect(result).toHaveProperty("movies");
+      expect(result).toHaveProperty("totalPages");
+      expect(result).toHaveProperty("totalElements");
     });
 
     it("should handle empty content array", async () => {
       const emptyResponse: MoviePagedResponse = {
         content: [],
-        pageable: { pageNumber: 0, pageSize: 10 },
+        pageable: {
+          unpaged: false,
+          paged: true,
+          pageSize: 10,
+          pageNumber: 0,
+          offset: 0,
+          sort: { unsorted: true, sorted: false, empty: true },
+        },
         totalElements: 0,
         totalPages: 0,
+        numberOfElements: 0,
+        size: 10,
+        number: 0,
+        sort: { unsorted: true, sorted: false, empty: true },
+        first: true,
+        last: true,
+        empty: true,
       };
 
       mockApiClient.get.mockResolvedValueOnce(emptyResponse);
 
       const result = await movieService.getMovies({});
 
-      expect(result).toEqual([]);
+      expect(result).toEqual({
+        movies: [],
+        totalPages: 0,
+        totalElements: 0,
+      });
     });
 
     it("should pass all filter parameters correctly", async () => {
@@ -166,9 +220,23 @@ describe("MovieService", () => {
       const year = 2020;
       const winnersResponse: MoviePagedResponse = {
         content: [mockMovies[0]],
-        pageable: { pageNumber: 0, pageSize: 99 },
+        pageable: {
+          unpaged: false,
+          paged: true,
+          pageSize: 99,
+          pageNumber: 0,
+          offset: 0,
+          sort: { unsorted: true, sorted: false, empty: true },
+        },
         totalElements: 1,
         totalPages: 1,
+        numberOfElements: 1,
+        size: 99,
+        number: 0,
+        sort: { unsorted: true, sorted: false, empty: true },
+        first: true,
+        last: true,
+        empty: false,
       };
 
       mockApiClient.get.mockResolvedValueOnce(winnersResponse);
@@ -238,9 +306,23 @@ describe("MovieService", () => {
 
       const winnersResponse: MoviePagedResponse = {
         content: winnersOnly,
-        pageable: { pageNumber: 0, pageSize: 99 },
+        pageable: {
+          unpaged: false,
+          paged: true,
+          pageSize: 99,
+          pageNumber: 0,
+          offset: 0,
+          sort: { unsorted: true, sorted: false, empty: true },
+        },
         totalElements: 1,
         totalPages: 1,
+        numberOfElements: 1,
+        size: 99,
+        number: 0,
+        sort: { unsorted: true, sorted: false, empty: true },
+        first: true,
+        last: true,
+        empty: false,
       };
 
       mockApiClient.get.mockResolvedValueOnce(winnersResponse);
@@ -254,9 +336,23 @@ describe("MovieService", () => {
     it("should handle empty winners for a year", async () => {
       const emptyResponse: MoviePagedResponse = {
         content: [],
-        pageable: { pageNumber: 0, pageSize: 99 },
+        pageable: {
+          unpaged: false,
+          paged: true,
+          pageSize: 99,
+          pageNumber: 0,
+          offset: 0,
+          sort: { unsorted: true, sorted: false, empty: true },
+        },
         totalElements: 0,
         totalPages: 0,
+        numberOfElements: 0,
+        size: 99,
+        number: 0,
+        sort: { unsorted: true, sorted: false, empty: true },
+        first: true,
+        last: true,
+        empty: true,
       };
 
       mockApiClient.get.mockResolvedValueOnce(emptyResponse);

@@ -17,14 +17,16 @@ jest.mock("@/shared/components/ui/card", () => {
   };
 });
 jest.mock("@/shared/components/ui/simple-table", () => {
-  return function SimpleTable({ data, columns, showFilters, itemsPerPage, showPagination }: any) {
+  return function SimpleTable({ title, data, columns, showFilters, itemsPerPage, showPagination }: any) {
+    const testIdPrefix = title ? title.toLowerCase().replace(/\s+/g, "-") : "table";
     return (
-      <div data-testid="simple-table">
-        <div data-testid="table-show-filters">{String(showFilters)}</div>
-        <div data-testid="table-items-per-page">{itemsPerPage}</div>
-        <div data-testid="table-show-pagination">{String(showPagination)}</div>
-        <div data-testid="table-columns-count">{columns?.length || 0}</div>
-        <div data-testid="table-data-count">{data?.length || 0}</div>
+      <div data-testid={`simple-table-${testIdPrefix}`}>
+        <div data-testid={`${testIdPrefix}-title`}>{title}</div>
+        <div data-testid={`${testIdPrefix}-show-filters`}>{String(showFilters)}</div>
+        <div data-testid={`${testIdPrefix}-items-per-page`}>{itemsPerPage}</div>
+        <div data-testid={`${testIdPrefix}-show-pagination`}>{String(showPagination)}</div>
+        <div data-testid={`${testIdPrefix}-columns-count`}>{columns?.length || 0}</div>
+        <div data-testid={`${testIdPrefix}-data-count`}>{data?.length || 0}</div>
       </div>
     );
   };
@@ -57,7 +59,8 @@ describe("ProducerInterval", () => {
       render(<ProducerInterval />);
 
       expect(screen.getByTestId("card")).toBeInTheDocument();
-      expect(screen.getByTestId("simple-table")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-maximum")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-minimum")).toBeInTheDocument();
     });
 
     it("should render card with correct title", () => {
@@ -68,11 +71,13 @@ describe("ProducerInterval", () => {
       );
     });
 
-    it("should render simple table", () => {
+    it("should render both Maximum and Minimum tables", () => {
       render(<ProducerInterval />);
 
-      const table = screen.getByTestId("simple-table");
-      expect(table).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-maximum")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-minimum")).toBeInTheDocument();
+      expect(screen.getByTestId("maximum-title")).toHaveTextContent("Maximum");
+      expect(screen.getByTestId("minimum-title")).toHaveTextContent("Minimum");
     });
 
     it("should call useProducerInterval hook", () => {
@@ -113,10 +118,12 @@ describe("ProducerInterval", () => {
   });
 
   describe("data display", () => {
-    it("should pass producers data to SimpleTable", () => {
+    it("should split producers data between Maximum and Minimum tables", () => {
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-data-count")).toHaveTextContent("3");
+      // With 3 producers: first 2 in Maximum (index < 1.5), last 1 in Minimum (index >= 1.5)
+      expect(screen.getByTestId("maximum-data-count")).toHaveTextContent("2");
+      expect(screen.getByTestId("minimum-data-count")).toHaveTextContent("1");
     });
 
     it("should handle empty producers array", () => {
@@ -130,7 +137,8 @@ describe("ProducerInterval", () => {
 
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-data-count")).toHaveTextContent("0");
+      expect(screen.getByTestId("maximum-data-count")).toHaveTextContent("0");
+      expect(screen.getByTestId("minimum-data-count")).toHaveTextContent("0");
     });
 
     it("should handle single producer", () => {
@@ -144,7 +152,9 @@ describe("ProducerInterval", () => {
 
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-data-count")).toHaveTextContent("1");
+      // With 1 producer: first 0 in Maximum (0 < 0.5), none in Minimum
+      expect(screen.getByTestId("maximum-data-count")).toHaveTextContent("1");
+      expect(screen.getByTestId("minimum-data-count")).toHaveTextContent("0");
     });
 
     it("should handle many producers", () => {
@@ -164,7 +174,31 @@ describe("ProducerInterval", () => {
 
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-data-count")).toHaveTextContent("20");
+      // With 20 producers: first 10 in Maximum (index < 10), last 10 in Minimum (index >= 10)
+      expect(screen.getByTestId("maximum-data-count")).toHaveTextContent("10");
+      expect(screen.getByTestId("minimum-data-count")).toHaveTextContent("10");
+    });
+
+    it("should handle even number of producers", () => {
+      const evenProducers = [
+        mockProducers[0],
+        mockProducers[1],
+        mockProducers[2],
+        { producer: "Producer 4", interval: 2, previousWin: 1992, followingWin: 1994 },
+      ];
+      mockUseProducerInterval.mockReturnValue({
+        producers: evenProducers,
+        maxProducers: evenProducers.slice(0, 2),
+        minProducers: evenProducers.slice(2),
+        loading: false,
+        error: null,
+      });
+
+      render(<ProducerInterval />);
+
+      // With 4 producers: first 2 in Maximum (index < 2), last 2 in Minimum (index >= 2)
+      expect(screen.getByTestId("maximum-data-count")).toHaveTextContent("2");
+      expect(screen.getByTestId("minimum-data-count")).toHaveTextContent("2");
     });
   });
 
@@ -242,7 +276,7 @@ describe("ProducerInterval", () => {
       expect(screen.getByTestId("card-error")).toHaveTextContent("Network error");
     });
 
-    it("should still render table when there is an error", () => {
+    it("should still render both tables when there is an error", () => {
       mockUseProducerInterval.mockReturnValue({
         producers: [],
         maxProducers: [],
@@ -253,35 +287,38 @@ describe("ProducerInterval", () => {
 
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("simple-table")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-maximum")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-minimum")).toBeInTheDocument();
     });
   });
 
   describe("table configuration", () => {
-    it("should configure table with showFilters as false", () => {
+    it("should configure both tables with showFilters as false", () => {
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-show-filters")).toHaveTextContent("false");
+      expect(screen.getByTestId("maximum-show-filters")).toHaveTextContent("false");
+      expect(screen.getByTestId("minimum-show-filters")).toHaveTextContent("false");
     });
 
-    it("should configure table with itemsPerPage as 10", () => {
+    it("should configure both tables with itemsPerPage as 10", () => {
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-items-per-page")).toHaveTextContent("10");
+      expect(screen.getByTestId("maximum-items-per-page")).toHaveTextContent("10");
+      expect(screen.getByTestId("minimum-items-per-page")).toHaveTextContent("10");
     });
 
-    it("should configure table with showPagination as false", () => {
+    it("should configure both tables with showPagination as false", () => {
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-show-pagination")).toHaveTextContent(
-        "false"
-      );
+      expect(screen.getByTestId("maximum-show-pagination")).toHaveTextContent("false");
+      expect(screen.getByTestId("minimum-show-pagination")).toHaveTextContent("false");
     });
 
-    it("should pass 4 columns to table", () => {
+    it("should pass 4 columns to both tables", () => {
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-columns-count")).toHaveTextContent("4");
+      expect(screen.getByTestId("maximum-columns-count")).toHaveTextContent("4");
+      expect(screen.getByTestId("minimum-columns-count")).toHaveTextContent("4");
     });
   });
 
@@ -289,25 +326,29 @@ describe("ProducerInterval", () => {
     it("should have producer column configured correctly", () => {
       render(<ProducerInterval />);
       
-      expect(screen.getByTestId("simple-table")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-maximum")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-minimum")).toBeInTheDocument();
     });
 
     it("should have interval column configured correctly", () => {
       render(<ProducerInterval />);
       
-      expect(screen.getByTestId("simple-table")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-maximum")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-minimum")).toBeInTheDocument();
     });
 
     it("should have previousWin column configured correctly", () => {
       render(<ProducerInterval />);
       
-      expect(screen.getByTestId("simple-table")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-maximum")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-minimum")).toBeInTheDocument();
     });
 
     it("should have followingWin column configured correctly", () => {
       render(<ProducerInterval />);
       
-      expect(screen.getByTestId("simple-table")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-maximum")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-minimum")).toBeInTheDocument();
     });
   });
 
@@ -323,21 +364,25 @@ describe("ProducerInterval", () => {
       expect(screen.queryByTestId("card-error")).not.toBeInTheDocument();
     });
 
-    it("should integrate hook data with SimpleTable component", () => {
+    it("should integrate hook data with both SimpleTable components", () => {
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("simple-table")).toBeInTheDocument();
-      expect(screen.getByTestId("table-data-count")).toHaveTextContent("3");
+      expect(screen.getByTestId("simple-table-maximum")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-minimum")).toBeInTheDocument();
+      expect(screen.getByTestId("maximum-data-count")).toHaveTextContent("2");
+      expect(screen.getByTestId("minimum-data-count")).toHaveTextContent("1");
     });
 
     it("should handle all states together", () => {
       render(<ProducerInterval />);
 
       expect(screen.getByTestId("card")).toBeInTheDocument();
-      expect(screen.getByTestId("simple-table")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-maximum")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-minimum")).toBeInTheDocument();
       expect(screen.queryByTestId("card-loading")).not.toBeInTheDocument();
       expect(screen.queryByTestId("card-error")).not.toBeInTheDocument();
-      expect(screen.getByTestId("table-data-count")).toHaveTextContent("3");
+      expect(screen.getByTestId("maximum-data-count")).toHaveTextContent("2");
+      expect(screen.getByTestId("minimum-data-count")).toHaveTextContent("1");
     });
   });
 
@@ -414,36 +459,46 @@ describe("ProducerInterval", () => {
   });
 
   describe("table props", () => {
-    it("should pass data prop to SimpleTable", () => {
+    it("should pass data prop to both SimpleTables", () => {
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-data-count")).toHaveTextContent("3");
+      expect(screen.getByTestId("maximum-data-count")).toHaveTextContent("2");
+      expect(screen.getByTestId("minimum-data-count")).toHaveTextContent("1");
     });
 
-    it("should pass columns prop to SimpleTable", () => {
+    it("should pass columns prop to both SimpleTables", () => {
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-columns-count")).toHaveTextContent("4");
+      expect(screen.getByTestId("maximum-columns-count")).toHaveTextContent("4");
+      expect(screen.getByTestId("minimum-columns-count")).toHaveTextContent("4");
     });
 
-    it("should pass showFilters=false to SimpleTable", () => {
+    it("should pass showFilters=false to both SimpleTables", () => {
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-show-filters")).toHaveTextContent("false");
+      expect(screen.getByTestId("maximum-show-filters")).toHaveTextContent("false");
+      expect(screen.getByTestId("minimum-show-filters")).toHaveTextContent("false");
     });
 
-    it("should pass itemsPerPage=10 to SimpleTable", () => {
+    it("should pass itemsPerPage=10 to both SimpleTables", () => {
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-items-per-page")).toHaveTextContent("10");
+      expect(screen.getByTestId("maximum-items-per-page")).toHaveTextContent("10");
+      expect(screen.getByTestId("minimum-items-per-page")).toHaveTextContent("10");
     });
 
-    it("should pass showPagination=false to SimpleTable", () => {
+    it("should pass showPagination=false to both SimpleTables", () => {
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-show-pagination")).toHaveTextContent(
-        "false"
-      );
+      expect(screen.getByTestId("maximum-show-pagination")).toHaveTextContent("false");
+      expect(screen.getByTestId("minimum-show-pagination")).toHaveTextContent("false");
+    });
+
+    it("should pass title prop to both SimpleTables", () => {
+      render(<ProducerInterval />);
+
+      expect(screen.getByTestId("maximum-title")).toHaveTextContent("Maximum");
+      expect(screen.getByTestId("minimum-title")).toHaveTextContent("Minimum");
     });
   });
 
@@ -459,7 +514,8 @@ describe("ProducerInterval", () => {
 
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("simple-table")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-maximum")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-minimum")).toBeInTheDocument();
     });
 
     it("should handle null error", () => {
@@ -507,7 +563,9 @@ describe("ProducerInterval", () => {
 
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-data-count")).toHaveTextContent("3");
+      // With 3 producers: first 2 in Maximum (index 0,1), last 1 in Minimum (index 2)
+      expect(screen.getByTestId("maximum-data-count")).toHaveTextContent("2");
+      expect(screen.getByTestId("minimum-data-count")).toHaveTextContent("1");
     });
 
     it("should handle producers with same intervals", () => {
@@ -525,7 +583,8 @@ describe("ProducerInterval", () => {
 
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-data-count")).toHaveTextContent("2");
+      expect(screen.getByTestId("maximum-data-count")).toHaveTextContent("1");
+      expect(screen.getByTestId("minimum-data-count")).toHaveTextContent("1");
     });
 
     it("should handle only max producers", () => {
@@ -539,7 +598,8 @@ describe("ProducerInterval", () => {
 
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-data-count")).toHaveTextContent("2");
+      expect(screen.getByTestId("maximum-data-count")).toHaveTextContent("1");
+      expect(screen.getByTestId("minimum-data-count")).toHaveTextContent("1");
     });
 
     it("should handle only min producers", () => {
@@ -553,7 +613,9 @@ describe("ProducerInterval", () => {
 
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-data-count")).toHaveTextContent("1");
+      // With 1 producer: first 1 in Maximum (0 < 0.5), none in Minimum
+      expect(screen.getByTestId("maximum-data-count")).toHaveTextContent("1");
+      expect(screen.getByTestId("minimum-data-count")).toHaveTextContent("0");
     });
   });
 
@@ -562,8 +624,10 @@ describe("ProducerInterval", () => {
       render(<ProducerInterval />);
 
       // Verify component renders, which means producers have correct structure
-      expect(screen.getByTestId("simple-table")).toBeInTheDocument();
-      expect(screen.getByTestId("table-data-count")).toHaveTextContent("3");
+      expect(screen.getByTestId("simple-table-maximum")).toBeInTheDocument();
+      expect(screen.getByTestId("simple-table-minimum")).toBeInTheDocument();
+      expect(screen.getByTestId("maximum-data-count")).toHaveTextContent("2");
+      expect(screen.getByTestId("minimum-data-count")).toHaveTextContent("1");
     });
 
     it("should handle producers with very large intervals", () => {
@@ -580,7 +644,9 @@ describe("ProducerInterval", () => {
 
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-data-count")).toHaveTextContent("1");
+      // With 1 producer: first 1 in Maximum (0 < 0.5), none in Minimum
+      expect(screen.getByTestId("maximum-data-count")).toHaveTextContent("1");
+      expect(screen.getByTestId("minimum-data-count")).toHaveTextContent("0");
     });
 
     it("should handle producers with interval of 1", () => {
@@ -597,7 +663,9 @@ describe("ProducerInterval", () => {
 
       render(<ProducerInterval />);
 
-      expect(screen.getByTestId("table-data-count")).toHaveTextContent("1");
+      // With 1 producer: first 1 in Maximum (0 < 0.5), none in Minimum
+      expect(screen.getByTestId("maximum-data-count")).toHaveTextContent("1");
+      expect(screen.getByTestId("minimum-data-count")).toHaveTextContent("0");
     });
   });
 

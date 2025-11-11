@@ -32,6 +32,9 @@ jest.mock("@/shared/components/ui/simple-table", () => {
     showFilters,
     itemsPerPage,
     showPagination,
+    currentPage,
+    totalPages,
+    onPageChange,
   }: any) {
     return (
       <div data-testid="simple-table">
@@ -42,6 +45,16 @@ jest.mock("@/shared/components/ui/simple-table", () => {
         </div>
         <div data-testid="table-columns-count">{columns?.length || 0}</div>
         <div data-testid="table-data-count">{data?.length || 0}</div>
+        <div data-testid="table-current-page">{currentPage}</div>
+        <div data-testid="table-total-pages">{totalPages}</div>
+        {onPageChange && (
+          <button
+            data-testid="pagination-button"
+            onClick={() => onPageChange(1)}
+          >
+            Next Page
+          </button>
+        )}
       </div>
     );
   };
@@ -81,6 +94,8 @@ describe("MovieCard", () => {
     jest.clearAllMocks();
     mockUseMovies.mockReturnValue({
       movies: mockMovies,
+      totalPages: 1,
+      totalElements: 3,
       loading: false,
       error: null,
       refetch: jest.fn(),
@@ -211,21 +226,29 @@ describe("MovieCard", () => {
       expect(mockUseMovies).toHaveBeenCalledWith(initialFilters);
     });
 
-    it("should call hook with empty object when no initialFilters", () => {
+    it("should call hook with default page and size when no initialFilters", () => {
       render(<MovieCard title="Test" />);
-      expect(mockUseMovies).toHaveBeenCalledWith({});
+      expect(mockUseMovies).toHaveBeenCalledWith({ page: 0, size: 15 });
     });
 
     it("should handle year filter in initialFilters", () => {
       const initialFilters = { year: 1980 };
       render(<MovieCard title="Test" initialFilters={initialFilters} />);
-      expect(mockUseMovies).toHaveBeenCalledWith(initialFilters);
+      expect(mockUseMovies).toHaveBeenCalledWith({
+        year: 1980,
+        page: 0,
+        size: 15,
+      });
     });
 
     it("should handle winner filter in initialFilters", () => {
       const initialFilters = { winner: true };
       render(<MovieCard title="Test" initialFilters={initialFilters} />);
-      expect(mockUseMovies).toHaveBeenCalledWith(initialFilters);
+      expect(mockUseMovies).toHaveBeenCalledWith({
+        winner: true,
+        page: 0,
+        size: 15,
+      });
     });
 
     it("should handle multiple filters in initialFilters", () => {
@@ -341,6 +364,8 @@ describe("MovieCard", () => {
     it("should be disabled when loading", () => {
       mockUseMovies.mockReturnValue({
         movies: [],
+        totalPages: 1,
+        totalElements: 3,
         loading: true,
         error: null,
         refetch: jest.fn(),
@@ -380,6 +405,8 @@ describe("MovieCard", () => {
     it("should be disabled when loading", () => {
       mockUseMovies.mockReturnValue({
         movies: [],
+        totalPages: 1,
+        totalElements: 3,
         loading: true,
         error: null,
         refetch: jest.fn(),
@@ -395,6 +422,8 @@ describe("MovieCard", () => {
       const mockRefetch = jest.fn();
       mockUseMovies.mockReturnValue({
         movies: mockMovies,
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: mockRefetch,
@@ -416,6 +445,8 @@ describe("MovieCard", () => {
       const mockRefetch = jest.fn();
       mockUseMovies.mockReturnValue({
         movies: mockMovies,
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: mockRefetch,
@@ -437,6 +468,8 @@ describe("MovieCard", () => {
       const mockRefetch = jest.fn();
       mockUseMovies.mockReturnValue({
         movies: mockMovies,
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: mockRefetch,
@@ -460,6 +493,8 @@ describe("MovieCard", () => {
       const mockRefetch = jest.fn();
       mockUseMovies.mockReturnValue({
         movies: mockMovies,
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: mockRefetch,
@@ -481,6 +516,8 @@ describe("MovieCard", () => {
       const mockRefetch = jest.fn();
       mockUseMovies.mockReturnValue({
         movies: mockMovies,
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: mockRefetch,
@@ -502,6 +539,8 @@ describe("MovieCard", () => {
       const mockRefetch = jest.fn();
       mockUseMovies.mockReturnValue({
         movies: mockMovies,
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: mockRefetch,
@@ -531,6 +570,8 @@ describe("MovieCard", () => {
       const mockRefetch = jest.fn();
       mockUseMovies.mockReturnValue({
         movies: mockMovies,
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: mockRefetch,
@@ -575,6 +616,8 @@ describe("MovieCard", () => {
       const mockRefetch = jest.fn();
       mockUseMovies.mockReturnValue({
         movies: mockMovies,
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: mockRefetch,
@@ -607,6 +650,8 @@ describe("MovieCard", () => {
     it("should display empty state when no movies", () => {
       mockUseMovies.mockReturnValue({
         movies: [],
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: jest.fn(),
@@ -623,6 +668,8 @@ describe("MovieCard", () => {
 
       mockUseMovies.mockReturnValue({
         movies: [mockMovies[0]],
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: jest.fn(),
@@ -644,6 +691,8 @@ describe("MovieCard", () => {
     it("should show loading state", () => {
       mockUseMovies.mockReturnValue({
         movies: [],
+        totalPages: 1,
+        totalElements: 3,
         loading: true,
         error: null,
         refetch: jest.fn(),
@@ -655,6 +704,8 @@ describe("MovieCard", () => {
     it("should hide table data during loading", () => {
       mockUseMovies.mockReturnValue({
         movies: [],
+        totalPages: 1,
+        totalElements: 3,
         loading: true,
         error: null,
         refetch: jest.fn(),
@@ -672,6 +723,8 @@ describe("MovieCard", () => {
     it("should disable buttons when loading", () => {
       mockUseMovies.mockReturnValue({
         movies: [],
+        totalPages: 1,
+        totalElements: 3,
         loading: true,
         error: null,
         refetch: jest.fn(),
@@ -688,6 +741,8 @@ describe("MovieCard", () => {
     it("should display error message", () => {
       mockUseMovies.mockReturnValue({
         movies: [],
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: "Failed to fetch movies",
         refetch: jest.fn(),
@@ -706,6 +761,8 @@ describe("MovieCard", () => {
     it("should display network error", () => {
       mockUseMovies.mockReturnValue({
         movies: [],
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: "Network error",
         refetch: jest.fn(),
@@ -717,6 +774,8 @@ describe("MovieCard", () => {
     it("should allow filtering after error", () => {
       mockUseMovies.mockReturnValue({
         movies: [],
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: "Error occurred",
         refetch: jest.fn(),
@@ -802,6 +861,8 @@ describe("MovieCard", () => {
     it("should pass loading state to Card", () => {
       mockUseMovies.mockReturnValue({
         movies: [],
+        totalPages: 1,
+        totalElements: 3,
         loading: true,
         error: null,
         refetch: jest.fn(),
@@ -813,6 +874,8 @@ describe("MovieCard", () => {
     it("should pass error state to Card", () => {
       mockUseMovies.mockReturnValue({
         movies: [],
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: "Error message",
         refetch: jest.fn(),
@@ -825,6 +888,8 @@ describe("MovieCard", () => {
       const mockRefetch = jest.fn();
       mockUseMovies.mockReturnValue({
         movies: mockMovies,
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: mockRefetch,
@@ -847,6 +912,8 @@ describe("MovieCard", () => {
     it("should handle undefined movies gracefully", () => {
       mockUseMovies.mockReturnValue({
         movies: undefined as any,
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: jest.fn(),
@@ -859,6 +926,8 @@ describe("MovieCard", () => {
     it("should handle null movies gracefully", () => {
       mockUseMovies.mockReturnValue({
         movies: null as any,
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: jest.fn(),
@@ -871,6 +940,8 @@ describe("MovieCard", () => {
     it("should handle empty movies array", () => {
       mockUseMovies.mockReturnValue({
         movies: [],
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: jest.fn(),
@@ -883,6 +954,8 @@ describe("MovieCard", () => {
     it("should handle loading and error simultaneously", () => {
       mockUseMovies.mockReturnValue({
         movies: [],
+        totalPages: 1,
+        totalElements: 3,
         loading: true,
         error: "Error",
         refetch: jest.fn(),
@@ -896,6 +969,8 @@ describe("MovieCard", () => {
       const mockRefetch = jest.fn();
       mockUseMovies.mockReturnValue({
         movies: mockMovies,
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: mockRefetch,
@@ -914,6 +989,8 @@ describe("MovieCard", () => {
       const mockRefetch = jest.fn();
       mockUseMovies.mockReturnValue({
         movies: mockMovies,
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: mockRefetch,
@@ -931,6 +1008,8 @@ describe("MovieCard", () => {
     it("should handle single movie in array", () => {
       mockUseMovies.mockReturnValue({
         movies: [mockMovies[0]],
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: jest.fn(),
@@ -946,6 +1025,8 @@ describe("MovieCard", () => {
       const mockRefetch = jest.fn();
       mockUseMovies.mockReturnValue({
         movies: mockMovies,
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: mockRefetch,
@@ -967,12 +1048,18 @@ describe("MovieCard", () => {
       const mockRefetch = jest.fn();
       mockUseMovies.mockReturnValue({
         movies: mockMovies,
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: mockRefetch,
       });
 
       render(<MovieCard title="Test" showFilters={true} />);
+      
+      // Clear the initial refetch call from mount
+      mockRefetch.mockClear();
+      
       const yearInput = screen.getByPlaceholderText("Filter by year");
       const filterButton = screen.getByRole("button", { name: /filter/i });
 
@@ -995,6 +1082,8 @@ describe("MovieCard", () => {
       const mockRefetch = jest.fn();
       mockUseMovies.mockReturnValue({
         movies: mockMovies,
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: null,
         refetch: mockRefetch,
@@ -1058,6 +1147,8 @@ describe("MovieCard", () => {
     it("should pass loading to Card", () => {
       mockUseMovies.mockReturnValue({
         movies: [],
+        totalPages: 1,
+        totalElements: 3,
         loading: true,
         error: null,
         refetch: jest.fn(),
@@ -1069,6 +1160,8 @@ describe("MovieCard", () => {
     it("should pass error to Card", () => {
       mockUseMovies.mockReturnValue({
         movies: [],
+        totalPages: 1,
+        totalElements: 3,
         loading: false,
         error: "Test error",
         refetch: jest.fn(),

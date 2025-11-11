@@ -50,7 +50,11 @@ describe("useMoviesPreview", () => {
     jest.clearAllMocks();
     (ApiClient as jest.Mock).mockImplementation(() => mockApiClient);
     (MovieService as jest.Mock).mockImplementation(() => mockMovieService);
-    mockMovieService.getMovies.mockResolvedValue(mockMovies);
+    mockMovieService.getMovies.mockResolvedValue({
+      movies: mockMovies,
+      totalPages: 5,
+      totalElements: 100,
+    });
     mockMovieService.getWinnersByYear.mockResolvedValue(
       mockMovies.filter((m) => m.winner)
     );
@@ -240,7 +244,11 @@ describe("useMoviesPreview", () => {
 
   describe("data handling", () => {
     it("should return empty array when data is null", async () => {
-      mockMovieService.getMovies.mockResolvedValueOnce(null);
+      mockMovieService.getMovies.mockResolvedValueOnce({
+        movies: null,
+        totalPages: 0,
+        totalElements: 0,
+      });
 
       const { result } = renderHook(() => useMoviesPreview());
 
@@ -254,7 +262,11 @@ describe("useMoviesPreview", () => {
     });
 
     it("should return empty array when data is undefined", async () => {
-      mockMovieService.getMovies.mockResolvedValueOnce(undefined);
+      mockMovieService.getMovies.mockResolvedValueOnce({
+        movies: undefined,
+        totalPages: 0,
+        totalElements: 0,
+      });
 
       const { result } = renderHook(() => useMoviesPreview());
 
@@ -268,7 +280,11 @@ describe("useMoviesPreview", () => {
     });
 
     it("should handle empty movies array from API", async () => {
-      mockMovieService.getMovies.mockResolvedValueOnce([]);
+      mockMovieService.getMovies.mockResolvedValueOnce({
+        movies: [],
+        totalPages: 0,
+        totalElements: 0,
+      });
 
       const { result } = renderHook(() => useMoviesPreview());
 
@@ -282,7 +298,11 @@ describe("useMoviesPreview", () => {
     });
 
     it("should handle single movie", async () => {
-      mockMovieService.getMovies.mockResolvedValueOnce([mockMovies[0]]);
+      mockMovieService.getMovies.mockResolvedValueOnce({
+        movies: [mockMovies[0]],
+        totalPages: 1,
+        totalElements: 1,
+      });
 
       const { result } = renderHook(() => useMoviesPreview());
 
@@ -581,6 +601,12 @@ describe("useMoviesPreview", () => {
     });
 
     it("should handle movies with winners and non-winners", async () => {
+      mockMovieService.getMovies.mockResolvedValueOnce({
+        movies: mockMovies,
+        totalPages: 1,
+        totalElements: 3,
+      });
+
       const { result } = renderHook(() => useMoviesPreview());
 
       result.current.refetch();
@@ -602,7 +628,11 @@ describe("useMoviesPreview", () => {
         studios: ["Studio 1", "Studio 2"],
         producers: ["Producer 1", "Producer 2", "Producer 3"],
       };
-      mockMovieService.getMovies.mockResolvedValueOnce([movieWithMultiple]);
+      mockMovieService.getMovies.mockResolvedValueOnce({
+        movies: [movieWithMultiple],
+        totalPages: 1,
+        totalElements: 1,
+      });
 
       const { result } = renderHook(() => useMoviesPreview());
 
@@ -690,7 +720,11 @@ describe("useMoviesPreview", () => {
       const firstMovies = result.current.movies;
 
       const newMovies = [mockMovies[0]];
-      mockMovieService.getMovies.mockResolvedValueOnce(newMovies);
+      mockMovieService.getMovies.mockResolvedValueOnce({
+        movies: newMovies,
+        totalPages: 1,
+        totalElements: 1,
+      });
 
       result.current.refetch();
 
@@ -759,7 +793,11 @@ describe("useMoviesPreview", () => {
         id: i + 1,
         title: `Movie ${i + 1}`,
       }));
-      mockMovieService.getMovies.mockResolvedValueOnce(largeDataset);
+      mockMovieService.getMovies.mockResolvedValueOnce({
+        movies: largeDataset,
+        totalPages: 10,
+        totalElements: 1000,
+      });
 
       const { result } = renderHook(() => useMoviesPreview());
 

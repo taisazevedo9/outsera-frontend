@@ -3,10 +3,8 @@ import { useApiData } from "@/shared/hooks/use-api-data";
 import { DashboardService } from "../api/dashboard-service";
 import { ApiClient } from "@/shared/services/api-client";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
-
 export function useStudioStats(limit: number = 3) {
-  const apiClient = useMemo(() => new ApiClient(API_BASE), []);
+  const apiClient = useMemo(() => new ApiClient(), []);
   const dashboardService = useMemo(
     () => new DashboardService(apiClient),
     [apiClient]

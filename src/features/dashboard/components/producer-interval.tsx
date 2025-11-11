@@ -40,6 +40,8 @@ export function ProducerInterval({
   colSize = "col-md-6",
 }: ProducerIntervalProps) {
   const { producers, loading, error } = useProducerInterval();
+  
+  const safeProducers = producers || [];
 
   return (
     <Card
@@ -49,7 +51,16 @@ export function ProducerInterval({
       error={error}
     >
       <SimpleTable
-        data={producers}
+        title="Maximum"
+        data={safeProducers.filter((_, index) => index < safeProducers.length / 2)}
+        columns={producerColumns}
+        showFilters={false}
+        itemsPerPage={10}
+        showPagination={false}
+      />
+      <SimpleTable
+        title="Minimum"
+        data={safeProducers.filter((_, index) => index >= safeProducers.length / 2)}
         columns={producerColumns}
         showFilters={false}
         itemsPerPage={10}
