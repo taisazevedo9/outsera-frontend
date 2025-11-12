@@ -26,17 +26,15 @@ export class MovieService {
   }
 
   async getWinnersByYear(year: number): Promise<Movie[]> {
-    const response = await this.apiClient.get<MoviePagedResponse>(
-      "/api/movies",
+    const response = await this.apiClient.get<Movie[]>(
+      "/api/movies/winnersByYear",
       {
         params: {
-          page: 0,
-          size: 99,
           winner: true,
           year: year,
         },
       }
     );
-    return response.content;
+    return response;
   }
 }

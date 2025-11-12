@@ -68,13 +68,15 @@ export function MoviesPreview({ colSize = "col-md-6" }: MoviesPreviewProps) {
               onChange={(e) => setYearInput(e.target.value)}
               min="1900"
               max="2100"
+              maxLength={4}
+              required
             />
           </div>
           <div className="col-auto">
             <button
               className="btn btn-primary"
               onClick={handleSearch}
-              disabled={loading}
+              disabled={loading || !yearInput}
             >
               <i className="bi bi-search me-1"></i>
               Search
